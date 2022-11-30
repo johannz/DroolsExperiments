@@ -1,0 +1,25 @@
+package com.rinehartlabs;
+unit BasicRuleUnit;
+
+rule "update stat with modifier"
+    salience -5
+when
+    $statModifier: /modifiers
+    $stat: /stats[ type == $statModifier.type, modifiers not contains $statModifier]
+then
+    System.out.printf("update stat with modifier: %s, %s%n", $stat, $statModifier);
+    modify($stat){
+        add($statModifier);
+    }
+end
+
+rule "update stat points"
+    salience -10
+when
+    $stat: /stats[ value < 10 ]
+then
+    System.out.printf("update stat points: %s%n", $stat);
+    modify($stat) {
+        updatePoints(1);
+    }
+end
