@@ -4,37 +4,20 @@ unit BasicRuleUnit;
 import com.rinehartlabs.dto.Stat;
 
 rule "add stat"
-    salience -5
-when
-    $point: /statPoints
-    not /stats[ type == $point.type ]
-then
-    System.out.printf("add stat: %s%n", $point);
-    stats.add(new Stat($point.type(), $point.value()));
-end
-
-rule "update stat with modifier"
-    salience -5
 when
     $point: /statPoints
     accumulate( /modifiers[ type == $point.type, $value : value ];
         $modifiers : sum( $value ) )
-    $stat: /stats[ type == $point.type, value != $point.value + $modifiers ]
 then
-    System.out.printf("update stat with modifier: %s, %s%n", $point, $modifiers);
-    retract($stat);
-    stats.add(new Stat($point.type(), $point.value() + $modifiers));
+    System.out.printf("add stat with modifier: %s, %s%n", $point, $modifiers);
+    stats.addLogical(new Stat($point.type(), $point.value() + $modifiers));
 end
 
-rule "update stat points"
-    salience -10
+rule "display stat"
 when
-    $stat: /stats[ value < 4 ]
-    $point: /statPoints[ $type: type == $stat.type, $value: value ]
+    $stat: /stats
 then
-    System.out.printf("update stat points: %s, %s%n", $stat, $point);
-    retract($point);
-    statPoints.add(new Stat($type, $value + 1));
+    System.out.printf("display stat: %s%n", $stat);
 end
 
 query FindStats
