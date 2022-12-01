@@ -12,23 +12,27 @@ public class Main {
     public static void main(String[] args) {
         try (RuleUnitInstance<BasicRuleUnit> instance = RuleUnitProvider.get().createRuleUnitInstance(new BasicRuleUnit())) {
             BasicRuleUnit basicRuleUnit = instance.ruleUnitData();
-            Stat strength = new Stat(STRENGTH);
-            Stat dexterity = new Stat(DEXTERITY);
-            StatModifier strRace = new StatModifier(STRENGTH, "racial", 1);
-            StatModifier strSpell = new StatModifier(STRENGTH, "spell", 2);
-            StatModifier dexRace = new StatModifier(DEXTERITY, "racial", 2);
 
-            basicRuleUnit.getStats().add(strength);
-            basicRuleUnit.getStats().add(dexterity);
-            basicRuleUnit.getModifiers().add(strRace);
-            basicRuleUnit.getModifiers().add(strSpell);
-            basicRuleUnit.getModifiers().add(dexRace);
+            basicRuleUnit.getStatPoints().add(new Stat(STRENGTH, 0));
+            basicRuleUnit.getStatPoints().add(new Stat(DEXTERITY, 0));
+
+            basicRuleUnit.getModifiers().add(new StatModifier(STRENGTH, "racial", -1));
+            basicRuleUnit.getModifiers().add(new StatModifier(DEXTERITY, "racial", -2));
 
             instance.fire();
+
             System.out.println("---");
-            System.out.println(strength);
-            System.out.println(dexterity);
+            instance.executeQuery("FindStats").toList().forEach(System.out::println);
             System.out.println("---");
+
+            basicRuleUnit.getModifiers().add(new StatModifier(STRENGTH, "spell", 2));
+            basicRuleUnit.getModifiers().add(new StatModifier(DEXTERITY, "spell", -2));
+            instance.fire();
+
+            System.out.println("---");
+            instance.executeQuery("FindStats").toList().forEach(System.out::println);
+            System.out.println("---");
+
         }
     }
 }
